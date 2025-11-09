@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisata Lombok NTB - Detail Destinasi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .cost-calculator {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .destination-image {
+            height: 400px;
+            object-fit: cover;
+            width: 100%;
+            border-radius: 12px;
+        }
+        
+        .feature-list li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            color: #16a34a;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .transport-option {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .transport-option:hover {
+            border-color: #16a34a;
+            background-color: #f0fdf4;
+        }
+        
+        .transport-option.selected {
+            border-color: #16a34a;
+            background-color: #dcfce7;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold text-green-700">Wisata Lombok NTB</h1>
+            </div>
+            <ul class="hidden md:flex space-x-6">
+                <li><a href="index.html" class="text-gray-600 hover:text-green-500">Beranda</a></li>
+                <li><a href="destinasi.html" class="text-gray-600 hover:text-green-500">Destinasi</a></li>
+                <li><a href="galeri.html" class="text-gray-600 hover:text-green-500">Galeri</a></li>
+                <li><a href="kontak.html" class="text-gray-600 hover:text-green-500">Kontak & Ulasan</a></li>
+            </ul>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-600 hover:text-green-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white py-2 px-4">
+            <a href="index.html" class="block py-2 text-gray-600 hover:text-green-500">Beranda</a>
+            <a href="destinasi.html" class="block py-2 text-gray-600 hover:text-green-500">Destinasi</a>
+            <a href="galeri.html" class="block py-2 text-gray-600 hover:text-green-500">Galeri</a>
+            <a href="kontak.html" class="block py-2 text-gray-600 hover:text-green-500">Kontak & Ulasan</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6" aria-label="breadcrumb">
+            <ol class="flex space-x-2 text-sm text-gray-600">
+                <li><a href="index.html" class="hover:text-green-600">Beranda</a></li>
+                <li class="before:content-['/'] before:mx-2"><a href="destinasi.html" class="hover:text-green-600">Destinasi</a></li>
+                <li class="before:content-['/'] before:mx-2"><span class="text-green-600 font-medium" id="breadcrumb-destination">Detail Destinasi</span></li>
+            </ol>
+        </nav>
+
+        <!-- Destination Content -->
+        <div id="destination-content">
+            <!-- Content akan diisi oleh JavaScript berdasarkan parameter URL -->
+            <div class="text-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Memuat informasi destinasi...</p>
+            </div>
+        </div>
+
+        <!-- Interactive Features Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+            <!-- Weather Information -->
+            <div class="weather-card">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Informasi Cuaca</h3>
+                <div class="text-center py-6">
+                    <div id="weather-icon" class="text-6xl mb-4">🌤️</div>
+                    <p id="weather-status" class="text-lg font-semibold text-gray-700">Status Cuaca</p>
+                    <p id="weather-temp" class="text-2xl font-bold text-gray-800 mt-2">-</p>
+                    <p id="weather-desc" class="text-gray-600 mt-2">Klik tombol untuk memuat informasi cuaca</p>
+                </div>
+                <button id="weather-btn" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                    Cek Info Cuaca
+                </button>
+            </div>
+
+            <!-- Cost Calculator -->
+            <div class="cost-calculator">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Kalkulator Estimasi Biaya</h3>
+                
+                <div class="space-y-4">
+                    <!-- Jarak -->
+                    <div>
+                        <label for="distance" class="block text-sm font-medium text-gray-700 mb-2">Jarak Tempuh (km)</label>
+                        <input type="number" id="distance" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan jarak" min="1" value="50">
+                    </div>
+                    
+                    <!-- Transportasi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Transportasi</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="transport-option" data-cost="5000">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                        <span>🚗</span>
+                                    </div>
+                                    <span>Mobil Pribadi</span>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Rp 5.000/km</div>
+                            </div>
+                            <div class="transport-option" data-cost="3000">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-2">
+                                        <span>🏍️</span>
+                                    </div>
+                                    <span>Motor</span>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Rp 3.000/km</div>
+                            </div>
+                            <div class="transport-option" data-cost="10000">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-2">
+                                        <span>🚕</span>
+                                    </div>
+                                    <span>Taxi</span>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Rp 10.000/km</div>
+                            </div>
+                            <div class="transport-option" data-cost="2000">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-2">
+                                        <span>🚌</span>
+                                    </div>
+                                    <span>Bus</span>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Rp 2.000/km</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hasil Perhitungan -->
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600">Estimasi Biaya:</span>
+                            <span id="estimated-cost" class="text-2xl font-bold text-green-600">Rp 0</span>
+                        </div>
+                        <div class="text-sm text-gray-500" id="cost-breakdown"></div>
+                    </div>
+                    
+                    <button id="calculate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                        Hitung Estimasi Biaya
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p>&copy; 2025 Wisata Lombok NTB. By_AZIS</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white transition duration-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Data destinasi yang sama dengan destinasi.html
+        const destinations = {
+            'gunung-rinjani': {
+                title: 'Gunung Rinjani',
+                image: 'assets/img/gunung rinjani.jpg',
+                category: 'alam',
+                description: 'Gunung Rinjani adalah gunung berapi aktif tertinggi kedua di Indonesia dengan ketinggian 3.726 mdpl. Gunung ini terletak di Pulau Lombok, Nusa Tenggara Barat dan menjadi salah satu destinasi pendakian terpopuler di Indonesia.',
+                longDescription: `Gunung Rinjani merupakan salah satu gunung berapi tertinggi di Indonesia yang menawarkan pemandangan spektakuler. Di puncaknya terdapat danau kawah Segara Anak yang berwarna biru kehijauan, dengan suhu air hangat karena aktivitas vulkanik.
+
+Fasilitas yang tersedia:
+- Pos pendakian dengan informasi lengkap
+- Pemandu profesional bersertifikat
+- Area berkemah yang aman
+- Warung makan sederhana di basecamp
+
+Waktu terbaik untuk mendaki adalah antara April hingga November ketika cuaca relatif kering. Pendakian biasanya memakan waktu 2-4 hari tergantung rute yang dipilih.`,
+                location: 'Taman Nasional Gunung Rinjani, Lombok, NTB',
+                features: [
+                    'Danau kawah Segara Anak',
+                    'Pemandangan sunrise/sunset spektakuler',
+                    'Air panas alami',
+                    'Flora dan fauna endemik',
+                    'Camping area yang aman'
+                ],
+                tips: [
+                    'Bawa perlengkapan pendakian lengkap',
+                    'Gunakan jasa pemandu bersertifikat',
+                    'Periksa kondisi cuaca sebelum berangkat',
+                    'Bawa persediaan air dan makanan cukup',
+                    'Latihan fisik sebelum pendakian'
+                ]
+            },
+            'pantai-kuta-lombok': {
+                title: 'Pantai Kuta Lombok',
+                image: 'assets/img/pantai_kuta.png',
+                category: 'alam',
+                description: 'Pantai dengan pasir putih yang membentang indah, ombak yang cocok untuk berselancar, dan pemandangan bukit-bukit hijau di sekitarnya.',
+                longDescription: `Pantai Kuta Lombok terkenal dengan pasir putihnya yang halus dan air laut yang jernih. Pantai ini menjadi surga bagi para peselancar dengan ombak yang konsisten sepanjang tahun. Di sekeliling pantai terdapat bukit-bukit hijau yang menambah keindahan panorama.
+
+Fasilitas yang tersedia:
+- Penyewaan papan selancar
+- Warung makan seafood segar
+- Penginapan dengan berbagai budget
+- Toko souvenir khas Lombok`,
+                location: 'Kuta, Lombok Tengah, NTB',
+                features: [
+                    'Pasir putih halus',
+                    'Ombak cocok untuk selancar',
+                    'Pemandangan bukit hijau',
+                    'Sunset yang indah',
+                    'Warung seafood segar'
+                ],
+                tips: [
+                    'Bawa tabir surya',
+                    'Sewa papan selancar lokal',
+                    'Coba seafood segar di warung pinggir pantai',
+                    'Kunjungi pada sore hari untuk sunset',
+                    'Jaga kebersihan pantai'
+                ]
+            },
+            'gili-trawangan': {
+                title: 'Gili Trawangan',
+                image: 'assets/img/gilitrawangan.png',
+                category: 'alam',
+                description: 'Pulau kecil tanpa kendaraan bermotor dengan pantai pasir putih, terumbu karang yang indah, dan kehidupan malam yang menarik.',
+                longDescription: `Gili Trawangan adalah yang terbesar dari tiga pulau Gili di Lombok. Pulau ini dikenal dengan pantai pasir putihnya, air laut biru jernih, dan terumbu karang yang masih terjaga. Yang unik, tidak ada kendaraan bermotor di pulau ini - transportasi utama adalah sepeda dan cidomo (kereta kuda).
+
+Fasilitas yang tersedia:
+- Resort dan penginapan berbagai kelas
+- Restoran dan kafe internasional
+- Pusat penyelaman (diving center)
+- Spa dan pijat tradisional
+- Bar dan klub malam`,
+                location: 'Gili Trawangan, Lombok Utara, NTB',
+                features: [
+                    'Bebas kendaraan bermotor',
+                    'Snorkeling dan diving spot',
+                    'Sunset view spektakuler',
+                    'Kehidupan malam yang hidup',
+                    'Restoran internasional'
+                ],
+                tips: [
+                    'Sewa sepeda untuk keliling pulau',
+                    'Coba snorkeling di turtle point',
+                    'Nikmati sunset di bar tepi pantai',
+                    'Bawa uang tunai cukup',
+                    'Hargai budaya lokal'
+                ]
+            },
+            'desa-sade': {
+                title: 'Desa Sade',
+                image: 'assets/img/desa_sade.png',
+                category: 'budaya',
+                description: 'Desa adat suku Sasak yang masih mempertahankan tradisi dan arsitektur rumah tradisional dengan atap alang-alang.',
+                longDescription: `Desa Sade adalah desa adat suku Sasak yang masih mempertahankan tradisi dan cara hidup leluhur. Rumah-rumah tradisional dengan atap alang-alang, lantai dari tanah liat, dan struktur bambu masih digunakan hingga kini. Pengunjung dapat menyaksikan langsung proses tenun tradisional dan berbagai ritual adat.
+
+Fasilitas yang tersedia:
+- Pemandu wisata lokal
+- Workshop tenun tradisional
+- Toko souvenir kain tenun
+- Area parkir yang luas
+- Warung makan tradisional`,
+                location: 'Desa Sade, Kecamatan Pujut, Lombok Tengah',
+                features: [
+                    'Arsitektur rumah tradisional Sasak',
+                    'Proses tenun tradisional',
+                    'Tarian dan musik tradisional',
+                    'Kain tenun khas Lombok',
+                    'Pemandu wisata berpengetahuan'
+                ],
+                tips: [
+                    'Hormati adat dan tradisi setempat',
+                    'Beli kain tenun sebagai souvenir',
+                    'Foto hanya di area yang diizinkan',
+                    'Dengarkan penjelasan pemandu',
+                    'Coba makanan tradisional'
+                ]
+            },
+            'taman-narmada': {
+                title: 'Taman Narmada',
+                image: 'assets/img/taman_narmada.png',
+                category: 'budaya',
+                description: 'Taman peninggalan Kerajaan Mataram Lombok dengan kolam pemandian, taman yang asri, dan replika Danau Segara Anak.',
+                longDescription: `Taman Narmada dibangun pada tahun 1727 oleh Raja Mataram Lombok sebagai tempat peristirahatan dan persembahan. Taman ini memiliki kolam pemandian yang masih berfungsi hingga kini, serta replika Danau Segara Anak dan Gunung Rinjani yang digunakan untuk upacara keagamaan.
+
+Fasilitas yang tersedia:
+- Kolam pemandian yang terawat
+- Taman yang luas dan asri
+- Museum sejarah kecil
+- Warung makan dan minuman
+- Area bermain anak`,
+                location: 'Kecamatan Narmada, Lombok Barat, NTB',
+                features: [
+                    'Kolam pemandian bersejarah',
+                    'Arsitektur tradisional Sasak-Bali',
+                    'Taman yang rindang dan asri',
+                    'Replika Danau Segara Anak',
+                    'Area ritual keagamaan'
+                ],
+                tips: [
+                    'Pakai pakaian yang sopan',
+                    'Coba berenang di kolam pemandian',
+                    'Kunjungi pada pagi atau sore hari',
+                    'Bawa kamera untuk foto',
+                    'Pelajari sejarah taman dari pemandu'
+                ]
+            },
+            'masjid-islamic-center': {
+                title: 'Masjid Islamic Center',
+                image: 'assets/img/masjid_islamic_center.png',
+                category: 'budaya',
+                description: 'Masjid megah dengan arsitektur yang memadukan gaya Timur Tengah dan lokal, menjadi ikon baru Lombok.',
+                longDescription: `Masjid Islamic Center NTB adalah masjid terbesar di Lombok dengan kapasitas 15.000 jamaah. Arsitekturnya memadukan gaya Timur Tengah dengan elemen lokal Lombok, menciptakan bangunan yang megah namun tetap bernuansa Nusantara. Menara setinggi 99 meter menjadi landmark baru Kota Mataram.
+
+Fasilitas yang tersempat:
+- Area parkir yang luas
+- Perpustakaan Islam
+- Ruang pertemuan dan seminar
+- Toko souvenir Islami
+- Kantin dan area makan`,
+                location: 'Jalan Pendidikan, Mataram, Lombok, NTB',
+                features: [
+                    'Arsitektur megah Timur Tengah',
+                    'Menara setinggi 99 meter',
+                    'Kaligrafi artistik',
+                    'Pemandangan kota dari menara',
+                    'Area yang luas dan nyaman'
+                ],
+                tips: [
+                    'Pakai pakaian yang sopan dan tertutup',
+                    'Kunjungi di luar waktu sholat',
+                    'Naik menara untuk pemandangan kota',
+                    'Jaga ketenangan di area masjid',
+                    'Foto dari luar untuk menghormati kekhusukan'
+                ]
+            },
+            'sate-rembiga': {
+                title: 'Sate Rembiga',
+                image: 'assets/img/sate_rembiga.png',
+                category: 'kuliner',
+                description: 'Kuliner khas Lombok berupa sate daging sapi dengan bumbu kacang yang khas, disajikan dengan lontong dan kuah kaldu.',
+                longDescription: `Sate Rembiga adalah kuliner ikonik Lombok yang berasal dari daerah Rembiga, Mataram. Sate ini terbuat dari daging sapi yang dibumbui rempah-rempah khas, kemudian dibakar dan disajikan dengan bumbu kacang yang gurih serta kuah kaldu sapi yang hangat. Biasanya disajikan dengan lontong dan irisan bawang merah.
+
+Fasilitas yang tersedia:
+- Warung makan khusus sate Rembiga
+- Area parkir yang memadai
+- Toilet yang bersih
+- Tempat duduk yang nyaman`,
+                location: 'Jl. Rembiga, Mataram, Lombok, NTB',
+                features: [
+                    'Daging sapi pilihan berkualitas',
+                    'Bumbu kacang khas Rembiga',
+                    'Kuah kaldu sapi yang gurih',
+                    'Lontong dan pelengkap segar',
+                    'Proses pembakaran tradisional'
+                ],
+                tips: [
+                    'Coba dengan level pedas sesuai selera',
+                    'Tambahkan perasan jeruk nipis',
+                    'Makan selagi hangat',
+                    'Pesan extra bumbu jika suka',
+                    'Kunjungi warung yang sudah terkenal'
+                ]
+            },
+            'air-terjun-sendang-gile': {
+                title: 'Air Terjun Sendang Gile',
+                image: 'assets/img/air_terjun_gile.png',
+                category: 'alam',
+                description: 'Air terjun yang terletak di kaki Gunung Rinjani dengan air jernih yang mengalir deras, dikelilingi hutan yang rimbun.',
+                longDescription: `Air Terjun Sendang Gile berada di kawasan Taman Nasional Gunung Rinjani, tepatnya di Desa Senaru. Air terjun ini memiliki ketinggian sekitar 30 meter dengan air yang sangat jernih berasal dari mata air Gunung Rinjani. Perjalanan menuju air terjun melewati jalur trekking yang menyenangkan melalui hutan tropis.
+
+Fasilitas yang tersedia:
+- Area parkir kendaraan
+- Warung makan dan minuman
+- Pemandu lokal
+- Toilet umum
+- Tempat istirahat`,
+                location: 'Desa Senaru, Kecamatan Bayan, Lombok Utara',
+                features: [
+                    'Air jernih dari mata air Rinjani',
+                    'Pemandangan hutan tropis',
+                    'Udara sejuk dan segar',
+                    'Spot foto yang indah',
+                    'Pengalaman trekking menyenangkan'
+                ],
+                tips: [
+                    'Pakai sepatu yang nyaman untuk trekking',
+                    'Bawa air minum dan snack',
+                    'Awas licin di area air terjun',
+                    'Kunjungi di musim kemarau',
+                    'Gunakan jasa pemandu lokal'
+                ]
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get destination parameter from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const destinationId = urlParams.get('destinasi');
+            
+            // Mobile menu functionality
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Load destination data
+            if (destinationId && destinations[destinationId]) {
+                loadDestination(destinations[destinationId]);
+            } else {
+                document.getElementById('destination-content').innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">❌</div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Destinasi Tidak Ditemukan</h2>
+                        <p class="text-gray-600 mb-6">Destinasi yang Anda cari tidak tersedia.</p>
+                        <a href="destinasi.html" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                            Kembali ke Daftar Destinasi
+                        </a>
+                    </div>
+                `;
+            }
+
+            // Weather functionality
+            const weatherBtn = document.getElementById('weather-btn');
+            const weatherStatus = document.getElementById('weather-status');
+            const weatherTemp = document.getElementById('weather-temp');
+            const weatherDesc = document.getElementById('weather-desc');
+            const weatherIcon = document.getElementById('weather-icon');
+
+            weatherBtn.addEventListener('click', function() {
+                // Simulate API call with random weather data
+                const weatherConditions = [
+                    { status: 'Cerah', temp: '28°C', desc: 'Cuaca cerah, cocok untuk berwisata', icon: '☀️' },
+                    { status: 'Berawan', temp: '26°C', desc: 'Sedikit berawan, udara sejuk', icon: '🌤️' },
+                    { status: 'Hujan Ringan', temp: '24°C', desc: 'Hujan ringan, bawa payung', icon: '🌦️' },
+                    { status: 'Mendung', temp: '25°C', desc: 'Mendung, mungkin akan hujan', icon: '☁️' },
+                    { status: 'Cerah Berawan', temp: '27°C', desc: 'Cerah dengan awan putih', icon: '⛅' }
+                ];
+
+                const randomWeather = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
+                
+                weatherStatus.textContent = randomWeather.status;
+                weatherTemp.textContent = randomWeather.temp;
+                weatherDesc.textContent = randomWeather.desc;
+                weatherIcon.textContent = randomWeather.icon;
+            });
+
+            // Cost calculator functionality
+            const transportOptions = document.querySelectorAll('.transport-option');
+            const distanceInput = document.getElementById('distance');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const estimatedCost = document.getElementById('estimated-cost');
+            const costBreakdown = document.getElementById('cost-breakdown');
+
+            let selectedTransport = null;
+
+            transportOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    transportOptions.forEach(opt => opt.classList.remove('selected'));
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    selectedTransport = this;
+                });
+            });
+
+            // Select first transport option by default
+            if (transportOptions.length > 0) {
+                transportOptions[0].classList.add('selected');
+                selectedTransport = transportOptions[0];
+            }
+
+            calculateBtn.addEventListener('click', function() {
+                const distance = parseFloat(distanceInput.value);
+                
+                if (!distance || distance <= 0) {
+                    alert('Masukkan jarak yang valid!');
+                    return;
+                }
+
+                if (!selectedTransport) {
+                    alert('Pilih jenis transportasi!');
+                    return;
+                }
+
+                const costPerKm = parseFloat(selectedTransport.getAttribute('data-cost'));
+                const totalCost = distance * costPerKm;
+
+                // Format to Indonesian Rupiah
+                const formattedCost = new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(totalCost);
+
+                estimatedCost.textContent = formattedCost;
+                
+                const transportName = selectedTransport.querySelector('span').textContent;
+                costBreakdown.textContent = `${distance} km × Rp ${costPerKm.toLocaleString('id-ID')}/km (${transportName})`;
+            });
+
+            // Calculate initial cost
+            if (selectedTransport && distanceInput.value) {
+                calculateBtn.click();
+            }
+        });
+
+        function loadDestination(destination) {
+            document.title = `Wisata Lombok NTB - ${destination.title}`;
+            document.getElementById('breadcrumb-destination').textContent = destination.title;
+
+            document.getElementById('destination-content').innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Main Image & Basic Info -->
+                    <div class="lg:col-span-2">
+                        <img src="${destination.image}" alt="${destination.title}" class="destination-image">
+                        <div class="mt-6">
+                            <h1 class="text-3xl font-bold text-gray-800 mb-4">${destination.title}</h1>
+                            <p class="text-gray-600 text-lg leading-relaxed">${destination.longDescription}</p>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Information -->
+                    <div class="space-y-6">
+                        <!-- Quick Info -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Informasi Singkat</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Kategori:</span>
+                                    <span class="font-semibold capitalize">${destination.category}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Lokasi:</span>
+                                    <span class="font-semibold text-right">${destination.location}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Features -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Fitur Utama</h3>
+                            <ul class="feature-list space-y-2">
+                                ${destination.features.map(feature => `<li>${feature}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <!-- Tips -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Tips Berwisata</h3>
+                            <ul class="space-y-2">
+                                ${destination.tips.map(tip => `<li class="flex items-start">
+                                    <span class="text-green-500 mr-2">•</span>
+                                    <span class="text-gray-600">${tip}</span>
+                                </li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Aksi</h3>
+                            <div class="space-y-3">
+                                <a href="galeri.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 block text-center">
+                                    Lihat Galeri Foto
+                                </a>
+                                <a href="kontak.html" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 block text-center">
+                                    Beri Ulasan
+                                </a>
+                                <a href="destinasi.html" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 block text-center">
+                                    Lihat Destinasi Lain
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
